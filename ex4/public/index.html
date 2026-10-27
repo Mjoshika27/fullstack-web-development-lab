@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Project Management Dashboard</title>
+<style>
+*{box-sizing:border-box}body{font-family:Arial;margin:0;background:#f2f4f8;color:#222}
+header{background:#263b5e;color:white;text-align:center;padding:18px}
+.container{max-width:1000px;margin:25px auto;padding:0 15px}
+.box,.task{background:white;padding:18px;margin-bottom:16px;border-radius:8px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+input,select{width:100%;padding:10px;margin:5px 0;border:1px solid #ccc;border-radius:4px}
+button{padding:9px 12px;border:0;border-radius:4px;background:#263b5e;color:white;cursor:pointer}
+button:hover{opacity:.85}.green{background:green}.orange{background:#bb7900}.red{background:#c62828}
+.summary{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.stat{text-align:center;background:#e8edf6;padding:12px;border-radius:5px}
+.stat b{display:block;font-size:23px;margin-top:5px}
+.tasks{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px}
+.actions{display:flex;gap:6px;flex-wrap:wrap}.msg{margin-top:8px}
+@media(max-width:600px){.grid,.summary{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<header><h1>Project Management Dashboard</h1><p>Create, assign and track tasks</p></header>
+<main class="container">
+<section class="box">
+<h2>Add New Task</h2>
+<form id="form">
+<div class="grid">
+<input id="title" placeholder="Task title" required>
+<input id="assignedTo" placeholder="Assign to employee" required>
+<select id="priority"><option>Low</option><option selected>Medium</option><option>High</option></select>
+<input id="deadline" type="date" required>
+</div>
+<p><button type="submit">Add Task</button></p><div id="msg" class="msg"></div>
+</form>
+</section>
+<section class="box">
+<h2>Task Summary</h2>
+<div class="summary">
+<div class="stat">Total<b id="total">0</b></div>
+<div class="stat">Pending<b id="pending">0</b></div>
+<div class="stat">In Progress<b id="progress">0</b></div>
+<div class="stat">Completed<b id="completed">0</b></div>
+</div>
+</section>
+<h2>Task List</h2><div id="tasks" class="tasks"></div>
+</main>
+<script>
+const form=document.getElementById("form"), msg=document.getElementById("msg");
+async function api(url,options={}){
+ const r=await fetch(url,{headers:{"Content-Type":"application/json"},...options});
+ const d=await r.json(); if(!r.ok)throw Error(d.error||"Request failed"); return d;
+}
+async function load(){
+ try{
+  const tasks=await api("/api/tasks");
+  document.getElementById("total").textContent=tasks.length;
+  document.getElementById("pending").textContent=tasks.filter(t=>t.status==="Pending").length;
+  document.getElementById("progress").textContent=tasks.filter(t=>t.status==="In Progress").length;
+  document.getElementById("completed").textContent=tasks.filter(t=>t.status==="Completed").length;
+  const area=document.getElementById("tasks"); area.innerHTML="";
+  if(!tasks.length){area.textContent="No tasks added yet.";return;}
+  tasks.forEach(t=>{
+   const card=document.createElement("article");card.className="task";
+   const h=document.createElement("h3");h.textContent=t.title;card.appendChild(h);
+   ["Assigned to: "+t.assignedTo,"Priority: "+t.priority,"Deadline: "+t.deadline,"Status: "+t.status].forEach(s=>{
+    const p=document.createElement("p");p.textContent=s;card.appendChild(p);
+   });
+   const actions=document.createElement("div");actions.className="actions";
+   [["In Progress","orange"],["Completed","green"],["Delete","red"]].forEach(([label,cls])=>{
+    const b=document.createElement("button");b.textContent=label;b.className=cls;
+    b.onclick=()=>label==="Delete"?removeTask(t.id):updateTask(t.id,label);actions.appendChild(b);
+   });
+   card.appendChild(actions);area.appendChild(card);
+  });
+ }catch(e){msg.textContent="Cannot connect to server. Start the backend first.";}
+}
+form.onsubmit=async e=>{
+ e.preventDefault();msg.textContent="";
+ try{
+  await api("/api/tasks",{method:"POST",body:JSON.stringify({
+   title:document.getElementById("title").value.trim(),
+   assignedTo:document.getElementById("assignedTo").value.trim(),
+   priority:document.getElementById("priority").value,
+   deadline:document.getElementById("deadline").value
+  })});
+  form.reset();document.getElementById("priority").value="Medium";
+  msg.style.color="green";msg.textContent="Task added successfully.";load();
+ }catch(e){msg.style.color="red";msg.textContent=e.message;}
+};
+async function updateTask(id,status){
+ try{await api("/api/tasks/"+id,{method:"PUT",body:JSON.stringify({status})});load();}
+ catch(e){alert(e.message);}
+}
+async function removeTask(id){
+ if(!confirm("Delete this task?"))return;
+ try{await api("/api/tasks/"+id,{method:"DELETE"});load();}
+ catch(e){alert(e.message);}
+}
+load();
+</script>
+</body>
+</html>

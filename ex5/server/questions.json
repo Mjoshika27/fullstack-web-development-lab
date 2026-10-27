@@ -1,0 +1,206 @@
+[
+  {
+    "id": "Q1",
+    "text": "Which programming language do you prefer?",
+    "type": "choice",
+    "options": [
+      "C++",
+      "Java",
+      "Python",
+      "JavaScript"
+    ]
+  },
+  {
+    "id": "Q2",
+    "text": "How often do you use online learning platforms?",
+    "type": "choice",
+    "options": [
+      "Daily",
+      "Several times a week",
+      "Sometimes",
+      "Rarely"
+    ]
+  },
+  {
+    "id": "Q3",
+    "text": "Which operating system do you use most frequently?",
+    "type": "choice",
+    "options": [
+      "Windows",
+      "Linux",
+      "macOS",
+      "Android / Other"
+    ]
+  },
+  {
+    "id": "Q4",
+    "text": "How many hours do you usually study each day?",
+    "type": "choice",
+    "options": [
+      "Less than 2 hours",
+      "2–4 hours",
+      "4–6 hours",
+      "More than 6 hours"
+    ]
+  },
+  {
+    "id": "Q5",
+    "text": "Which development tool do you use most often?",
+    "type": "choice",
+    "options": [
+      "Visual Studio Code",
+      "Visual Studio",
+      "IntelliJ IDEA",
+      "Other"
+    ]
+  },
+  {
+    "id": "Q6",
+    "text": "How do you prefer to learn a new technology?",
+    "type": "choice",
+    "options": [
+      "Video tutorials",
+      "Documentation",
+      "Hands-on projects",
+      "Live classes"
+    ]
+  },
+  {
+    "id": "Q7",
+    "text": "Do you participate in technical competitions or hackathons?",
+    "type": "choice",
+    "options": [
+      "Often",
+      "Sometimes",
+      "Not yet, but interested",
+      "No"
+    ]
+  },
+  {
+    "id": "Q8",
+    "text": "Which technology area interests you most?",
+    "type": "choice",
+    "options": [
+      "Web Development",
+      "Artificial Intelligence / ML",
+      "Cybersecurity",
+      "Cloud Computing",
+      "Data Analytics"
+    ]
+  },
+  {
+    "id": "Q9",
+    "text": "How often do you work on personal projects?",
+    "type": "choice",
+    "options": [
+      "Every week",
+      "Every month",
+      "Occasionally",
+      "Not currently"
+    ]
+  },
+  {
+    "id": "Q10",
+    "text": "What one change would improve your learning experience?",
+    "type": "text"
+  },
+  {
+    "id": "Q11",
+    "text": "How confident do you feel about solving programming problems?",
+    "type": "choice",
+    "options": [
+      "Very confident",
+      "Somewhat confident",
+      "Still learning",
+      "Need more practice"
+    ]
+  },
+  {
+    "id": "Q12",
+    "text": "Which resource helps you learn most effectively?",
+    "type": "choice",
+    "options": [
+      "Practice problems",
+      "Books / notes",
+      "Videos",
+      "Mentor or peer support"
+    ]
+  },
+  {
+    "id": "Q13",
+    "text": "How often do you work on group projects?",
+    "type": "choice",
+    "options": [
+      "Weekly",
+      "Monthly",
+      "A few times a semester",
+      "Rarely"
+    ]
+  },
+  {
+    "id": "Q14",
+    "text": "How often do you use AI tools for learning or development?",
+    "type": "choice",
+    "options": [
+      "Daily",
+      "A few times a week",
+      "Occasionally",
+      "Never"
+    ]
+  },
+  {
+    "id": "Q15",
+    "text": "Which kind of project would you most like to build?",
+    "type": "choice",
+    "options": [
+      "A website or web app",
+      "A mobile app",
+      "An AI-powered solution",
+      "An IoT / hardware project",
+      "A data dashboard"
+    ]
+  },
+  {
+    "id": "Q16",
+    "text": "What is the biggest challenge you face while learning technology?",
+    "type": "text"
+  },
+  {
+    "id": "Q17",
+    "text": "How useful are online classes for your learning?",
+    "type": "choice",
+    "options": [
+      "Extremely useful",
+      "Very useful",
+      "Somewhat useful",
+      "Not very useful"
+    ]
+  },
+  {
+    "id": "Q18",
+    "text": "Which type of assignment helps you learn best?",
+    "type": "choice",
+    "options": [
+      "Individual practical work",
+      "Group project",
+      "Written assignment",
+      "Presentation or demonstration"
+    ]
+  },
+  {
+    "id": "Q19",
+    "text": "How prepared do you feel for internships or technical interviews?",
+    "type": "choice",
+    "options": [
+      "Very prepared",
+      "Somewhat prepared",
+      "Still preparing",
+      "Just getting started"
+    ]
+  },
+  {
+    "id": "Q20",
+    "text": "What skill would you most like to develop next?",
+    "type": "text"
+  }
+]
