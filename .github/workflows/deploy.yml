@@ -1,0 +1,123 @@
+name: Deploy all experiment frontends to GitHub Pages
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: github-pages
+  cancel-in-progress: true
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Build all frontend applications and assemble website
+        shell: bash
+        run: |
+          set -euo pipefail
+          SITE="site"
+          REPO_BASE="/fullstack-web-development-lab"
+          rm -rf "$SITE"
+          mkdir -p "$SITE"/{ex1a,ex1b,ex2a,ex2b,ex3,ex4,ex5}
+
+          cat > "$SITE/index.html" <<'HTML'
+          <!doctype html>
+          <html lang="en">
+          <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <meta name="theme-color" content="#18243a">
+            <title>Joshika | Full Stack Web Development Lab</title>
+            <style>
+              *{box-sizing:border-box}body{margin:0;font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#f4f7fb;color:#172033}
+              header{padding:56px 22px 42px;background:linear-gradient(135deg,#17243a,#245a72);color:white;text-align:center}
+              header h1{margin:0;font-size:clamp(2rem,5vw,3.3rem);letter-spacing:-.04em}header p{max-width:690px;margin:14px auto 0;color:#dbe8f3;line-height:1.7}
+              main{width:min(1080px,calc(100% - 32px));margin:36px auto 56px}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(245px,1fr));gap:18px}
+              .card{display:flex;flex-direction:column;gap:12px;padding:23px;background:#fff;border:1px solid #e1e8f0;border-radius:18px;box-shadow:0 10px 30px rgba(26,43,70,.06)}
+              .tag{align-self:flex-start;padding:5px 9px;border-radius:999px;background:#eaf3fa;color:#245a72;font-size:.78rem;font-weight:750}
+              h2{margin:0;font-size:1.18rem} .card p{margin:0;color:#627086;line-height:1.6;flex:1}
+              .card a{display:inline-flex;justify-content:center;align-items:center;padding:11px 15px;border-radius:10px;background:#245a72;color:#fff;text-decoration:none;font-weight:700}
+              .card a:hover{background:#183f52}.note{margin:24px 0 0;padding:15px 17px;background:#fff8e7;border:1px solid #f1dfad;border-radius:12px;color:#765817;line-height:1.6;font-size:.93rem}
+              footer{text-align:center;padding:22px;color:#758197;font-size:.88rem}
+            </style>
+          </head>
+          <body>
+            <header><h1>Full Stack Web Development Lab</h1><p>Joshika's experiment showcase — open each frontend below.</p></header>
+            <main><div class="grid">
+              <section class="card"><span class="tag">Experiment 1(a)</span><h2>Personal Portfolio</h2><p>A responsive personal portfolio with profile, skills, education and projects.</p><a href="./ex1a/">Open Portfolio ↗</a></section>
+              <section class="card"><span class="tag">Experiment 1(b)</span><h2>MiniBlog</h2><p>A Twitter-inspired microblogging interface with posts, comments and following features.</p><a href="./ex1b/">Open MiniBlog ↗</a></section>
+              <section class="card"><span class="tag">Experiment 2(a)</span><h2>Spice Garden Restaurant</h2><p>A food delivery interface with menu browsing, a cart and checkout screens.</p><a href="./ex2a/">Open Food Delivery ↗</a></section>
+              <section class="card"><span class="tag">Experiment 2(b)</span><h2>ReLoop Classifieds</h2><p>A marketplace interface for browsing and listing used products.</p><a href="./ex2b/">Open Marketplace ↗</a></section>
+              <section class="card"><span class="tag">Experiment 3</span><h2>Leave Management System</h2><p>Employee and manager screens for leave applications and approval workflows.</p><a href="./ex3/">Open Leave Management ↗</a></section>
+              <section class="card"><span class="tag">Experiment 4</span><h2>Project Management</h2><p>The project management frontend included in the lab repository.</p><a href="./ex4/">Open Project Management ↗</a></section>
+              <section class="card"><span class="tag">Experiment 5</span><h2>Online Survey</h2><p>A survey interface for answering five randomly selected questions.</p><a href="./ex5/">Open Online Survey ↗</a></section>
+            </div><div class="note"><strong>Note:</strong> GitHub Pages hosts the frontend only. Features that call a local Node.js/Express API or MongoDB will need a separately hosted backend to work for other people online. This page is a convenient index for all experiment frontends.</div></main>
+            <footer>Full Stack Web Development Laboratory · Joshika</footer>
+          </body>
+          </html>
+          HTML
+
+          # EX1(a): static HTML portfolio and its profile image.
+          cp ex1a/ex1a_joshika_portfolio_fixed.html "$SITE/ex1a/index.html"
+          cp ex1a/profile.jpg "$SITE/ex1a/profile.jpg"
+
+          # Build a Vite frontend under its matching GitHub Pages sub-path.
+          build_vite_app() {
+            app_dir="$1"
+            slug="$2"
+            (
+              cd "$app_dir"
+              npm install
+              npm run build -- --base="${REPO_BASE}/${slug}/"
+            )
+            mkdir -p "$SITE/$slug"
+            cp -R "$app_dir/dist/." "$SITE/$slug/"
+          }
+
+          build_vite_app "ex1b/frontend" "ex1b"
+          build_vite_app "ex2a/frontend" "ex2a"
+          build_vite_app "ex2b/frontend" "ex2b"
+          build_vite_app "ex3/frontend" "ex3"
+
+          # EX4 uses files in public/ rather than a Vite build.
+          cp -R ex4/public/. "$SITE/ex4/"
+
+          # EX5's supplied Vite config imports the React plugin; install it for the build
+          # because the current client package.json may not list it yet.
+          (
+            cd ex5/client
+            npm install
+            npm install --no-save @vitejs/plugin-react@5.0.4
+            npm run build -- --base="${REPO_BASE}/ex5/"
+          )
+          cp -R ex5/client/dist/. "$SITE/ex5/"
+
+          touch "$SITE/.nojekyll"
+
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
